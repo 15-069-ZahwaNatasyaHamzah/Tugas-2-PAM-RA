@@ -6,7 +6,7 @@
 
 ## SCREENSHOT APLIKASI
 <img width="503" height="904" alt="image" src="https://github.com/user-attachments/assets/dac0240a-9a0f-40ac-9ad1-52f885009e3b" />
-<img width="1600" height="942" alt="image" src="https://github.com/user-attachments/assets/3c4ec8d3-c974-4741-aad5-b59dca3879fb" />
+<img width="507" height="899" alt="image" src="https://github.com/user-attachments/assets/93c3fdc4-94e6-48d9-998e-fc6cebbeeba5" />
 
 
 
