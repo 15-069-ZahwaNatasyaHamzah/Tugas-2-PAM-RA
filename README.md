@@ -1,3 +1,15 @@
+# Tugas 2 |  Pemrograman Aplikasi Mobile
+
+
+- **Nama:** Zahwa Natasya Hamzah
+- **NIM:** 123140069
+
+## SCREENSHOT APLIKASI
+
+<img width="503" height="904" alt="image" src="https://github.com/user-attachments/assets/dac0240a-9a0f-40ac-9ad1-52f885009e3b" />
+![WhatsApp Image 2026-02-18 at 22 45 45](https://github.com/user-attachments/assets/d231cb16-33d3-4c92-951f-a8feae0eeb60)
+
+
 This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
 
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
