@@ -1,57 +1,217 @@
 package org.example.project
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
-import kotlinproject.composeapp.generated.resources.Res
-import kotlinproject.composeapp.generated.resources.compose_multiplatform
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // Baris ini yang membuat konten ke tengah vertikal
-        ) {
-            Text("Halo, Zahwa Natasya Hamzah!")
-            Text("NIM: 123140069")
 
-            Spacer(modifier = Modifier.height(16.dp))
+    val repository = remember { DataRepository() }
+    val viewModel = remember { NewsViewModel(repository) }
 
-            Button(onClick = { showContent = !showContent }) {
-                Text("Klik Saya")
+    val currentNews by viewModel.newsFlow.collectAsState(
+        initial = News(0, "Memuat berita...", "")
+    )
+
+    val readCount by viewModel.readCount.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
+
+    val categories = listOf("Semua", "Tech", "Campus", "Cuaca", "Otomotif")
+
+    var expanded by remember { mutableStateOf(false) }
+    var openedNews by remember { mutableStateOf<News?>(null) }
+    var detailText by remember { mutableStateOf("") }
+
+    val scope = rememberCoroutineScope()
+
+    val iosBlue = Color(0xFF007AFF)
+    val iosBackground = Color(0xFFF2F2F7)
+
+    MaterialTheme(
+        colorScheme = lightColorScheme(
+            primary = iosBlue,
+            background = iosBackground,
+            surface = Color.White
+        )
+    ) {
+
+        Scaffold(
+            containerColor = iosBackground,
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            "News",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = iosBackground
+                    )
+                )
             }
+        ) { padding ->
 
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Platform: $greeting")
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    start = 20.dp,
+                    end = 20.dp,
+                    top = padding.calculateTopPadding() + 10.dp,
+                    bottom = 40.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                // FILTER
+                item {
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+
+                        TextField(
+                            value = selectedCategory,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Kategori") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White
+                            )
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            categories.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text(category) },
+                                    onClick = {
+                                        viewModel.setCategory(category)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // NEWS CARD
+                item {
+                    Card(
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(0.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+
+                        Column(modifier = Modifier.padding(20.dp)) {
+
+                            Text(
+                                text = currentNews.category,
+                                color = iosBlue,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            Text(
+                                text = currentNews.title,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = "$readCount kali dibaca",
+                                fontSize = 13.sp,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+
+                // BUTTON iOS STYLE
+                item {
+                    Button(
+                        onClick = {
+                            openedNews = currentNews
+                            scope.launch {
+                                detailText = repository.fetchNewsDetail(currentNews)
+                            }
+                        },
+                        shape = RoundedCornerShape(28.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = iosBlue
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(
+                            "Baca Selengkapnya",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                // DETAIL ARTICLE
+                if (openedNews != null && detailText.isNotEmpty()) {
+
+                    item {
+                        Card(
+                            shape = RoundedCornerShape(24.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(0.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+
+                            Column(modifier = Modifier.padding(20.dp)) {
+
+                                Text(
+                                    text = openedNews!!.title,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                Text(
+                                    text = detailText,
+                                    lineHeight = 22.sp,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
