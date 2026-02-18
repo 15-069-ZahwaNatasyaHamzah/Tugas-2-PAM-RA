@@ -1,5 +1,12 @@
 # Tugas 2 |  Pemrograman Aplikasi Mobile
 
+---
+
+## Deskripsi
+
+Aplikasi ini merupakan simulasi news feed yang menampilkan berita baru setiap 2 detik menggunakan Kotlin Flow. Aplikasi juga menerapkan filter kategori, transformasi data, StateFlow untuk state management, serta Coroutines untuk proses asynchronous.
+
+---
 
 - **Nama:** Zahwa Natasya Hamzah
 - **NIM:** 123140069
@@ -8,53 +15,37 @@
 <img width="503" height="904" alt="image" src="https://github.com/user-attachments/assets/dac0240a-9a0f-40ac-9ad1-52f885009e3b" />
 <img width="507" height="899" alt="image" src="https://github.com/user-attachments/assets/93c3fdc4-94e6-48d9-998e-fc6cebbeeba5" />
 
+## Implementasi 
 
+### 1. Flow
+- Menggunakan `flow {}` builder
+- Menggunakan `emit()` untuk mengirim data setiap 2 detik
+- Data dikumpulkan dengan `collect`
 
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+### 2. Operator Flow
+- `filter` untuk kategori berita
+- `map` untuk transformasi tampilan
+- `onEach` untuk update jumlah berita dibaca
+- `catch` untuk error handling
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+### 3. StateFlow
+- Menggunakan `MutableStateFlow`
+- Mengekspos sebagai `StateFlow`
+- Menyimpan jumlah berita yang sudah dibaca
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
-
-### Build and Run Android Application
-
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
-
-### Build and Run Desktop (JVM) Application
-
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
-
-### Build and Run iOS Application
-
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### 4. Coroutines
+- Menggunakan `viewModelScope`
+- Menggunakan `async` dan `await`
+- Menggunakan `Dispatchers.IO`
+- Tidak memblokir UI thread
 
 ---
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+## Cara Menjalankan
+
+1. Buka project di Android Studio  
+2. Sync Gradle  
+3. Jalankan di emulator atau device  
+
+---
+
